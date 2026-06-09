@@ -1,0 +1,83 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CareerCopilotTypes",
+  "definitions": {
+    "AgentEvent": {
+      "type": "object",
+      "properties": {
+        "agent": { "type": "string" },
+        "status": { "enum": ["pending", "working", "completed", "error"] },
+        "task": { "type": "string" },
+        "progress": { "type": "number", "minimum": 0, "maximum": 100 }
+      },
+      "required": ["agent", "status"]
+    },
+    "ResumeAnalysis": {
+      "type": "object",
+      "properties": {
+        "score": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "strengths": { "type": "array", "items": { "type": "string" } },
+        "weaknesses": { "type": "array", "items": { "type": "string" } },
+        "missing_keywords": { "type": "array", "items": { "type": "string" } },
+        "suggestions": { "type": "array", "items": { "type": "string" } },
+        "extracted_skills": { "type": "array", "items": { "type": "string" } },
+        "years_experience": { "type": "integer" },
+        "target_role": { "type": "string" }
+      }
+    },
+    "SkillGapAnalysis": {
+      "type": "object",
+      "properties": {
+        "target_role": { "type": "string" },
+        "skills": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "current": { "type": "number" },
+              "required": { "type": "number" },
+              "gap": { "type": "number" },
+              "priority": { "type": "string" }
+            }
+          }
+        },
+        "overall_readiness": { "type": "number" },
+        "top_gaps": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "CareerRoadmap": {
+      "type": "object",
+      "properties": {
+        "target_role": { "type": "string" },
+        "duration_months": { "type": "integer" },
+        "months": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "month": { "type": "integer" },
+              "title": { "type": "string" },
+              "skills": { "type": "array", "items": { "type": "string" } },
+              "resources": { "type": "array", "items": { "type": "string" } },
+              "milestones": { "type": "array", "items": { "type": "string" } }
+            }
+          }
+        }
+      }
+    },
+    "JobMatch": {
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "company": { "type": "string" },
+        "match_percent": { "type": "number" },
+        "required_skills": { "type": "array", "items": { "type": "string" } },
+        "matched_skills": { "type": "array", "items": { "type": "string" } },
+        "missing_skills": { "type": "array", "items": { "type": "string" } },
+        "location": { "type": "string" },
+        "apply_url": { "type": "string" }
+      }
+    }
+  }
+}
