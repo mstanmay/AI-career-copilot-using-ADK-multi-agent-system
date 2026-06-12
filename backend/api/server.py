@@ -65,10 +65,14 @@ MAX_RETRIES = 2
 session_service = InMemorySessionService()
 runner = Runner(app_name=APP_NAME, agent=root_agent, session_service=session_service)
 
+import os
+
+CORS_ORIGINS = os.getenv("CORS_ORIGINS", "*").split(",")
+
 app = FastAPI(title="AI Career Copilot API", version="2.0.0")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000", "*"],
+    allow_origins=CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -187,7 +191,7 @@ async def _run_with_retry(user_id: str, session_id: str, content, retries: int =
                 run_config=RunConfig(streaming_mode=StreamingMode.SSE),
             ):
                 events.append(event)
-            return events
+            yield events
         except Exception as e:
             last_error = e
             if attempt < retries:
