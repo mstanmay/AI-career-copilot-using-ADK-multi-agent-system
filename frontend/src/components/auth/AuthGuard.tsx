@@ -6,40 +6,33 @@ import { useAuthStore } from "@/stores/authStore";
 import { LoadingState } from "@/components/shared/LoadingState";
 
 export function AuthGuard({ children }: { children: ReactNode }) {
-  const { isAuthenticated, isLoading } = useAuthStore();
   const router = useRouter();
-  const [hasHydrated, setHasHydrated] = useState(false);
+  const [isHydrated, setIsHydrated] = useState(false);
 
-  // Wait for Zustand persist to actually finish rehydrating from localStorage
+  // Read auth state
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+
   useEffect(() => {
-    // Check if already hydrated (persist may have finished synchronously)
-    const unsub = useAuthStore.persist.onFinishHydration(() => {
-      setHasHydrated(true);
-    });
-
-    // If persist has already rehydrated before this effect ran
+    // Check if store is already hydrated
     if (useAuthStore.persist.hasHydrated()) {
-      setHasHydrated(true);
+      setIsHydrated(true);
     }
-
-    // Timeout fallback — never get stuck for more than 2 seconds
-    const timeout = setTimeout(() => {
-      setHasHydrated(true);
-    }, 2000);
-
-    return () => {
-      unsub();
-      clearTimeout(timeout);
-    };
+    // Listen for hydration completion
+    const unsub = useAuthStore.persist.onFinishHydration(() => {
+      setIsHydrated(true);
+    });
+    return () => unsub();
   }, []);
 
   useEffect(() => {
-    if (hasHydrated && !isLoading && !isAuthenticated) {
-      router.push("/login");
+    console.log("AuthGuard logic check:", { isHydrated, isAuthenticated });
+    if (isHydrated && !isAuthenticated) {
+      console.log("Redirecting to /login...");
+      router.replace("/login");
     }
-  }, [isAuthenticated, isLoading, hasHydrated, router]);
+  }, [isHydrated, isAuthenticated, router]);
 
-  if (!hasHydrated || isLoading) {
+  if (!isHydrated) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: "var(--bg-app)" }}>
         <LoadingState text="Verifying session..." />
